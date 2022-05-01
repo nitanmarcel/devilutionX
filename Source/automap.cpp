@@ -10,6 +10,7 @@
 #include "control.h"
 #include "engine/load_file.hpp"
 #include "engine/render/automap_render.hpp"
+#include "gendung.h"
 #include "inv.h"
 #include "monster.h"
 #include "palette.h"
@@ -503,14 +504,18 @@ void DrawAutomapText(const Surface &out)
 		return;
 	}
 
-	if (currlevel != 0) {
+	if (leveltype != DTYPE_TOWN) {
 		std::string description;
-		if (currlevel >= 17 && currlevel <= 20) {
+		switch (leveltype) {
+		case DTYPE_NEST:
 			description = fmt::format(_("Level: Nest {:d}"), currlevel - 16);
-		} else if (currlevel >= 21 && currlevel <= 24) {
+			break;
+		case DTYPE_CRYPT:
 			description = fmt::format(_("Level: Crypt {:d}"), currlevel - 20);
-		} else {
+			break;
+		default:
 			description = fmt::format(_("Level: {:d}"), currlevel);
+			break;
 		}
 
 		DrawString(out, description, linePosition);

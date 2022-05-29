@@ -1,0 +1,44 @@
+name: Linux_aarch64
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [ opened, synchronize ]
+
+jobs:
+  build_job:
+    # The host should always be linux
+    runs-on: ubuntu-18.04
+    name: Build on ubuntu-18.04 aarch64
+    
+    steps:
+      - uses: actions/checkout@v2.1.0
+      - uses: uraimo/run-on-arch-action@v2
+        name: Build artifact
+        id: build
+        with:
+          arch: aarch64
+          distro: ubuntu-18.04
+          githubToken: ${{ github.token }}
+          setup: |
+            mkdir -p "${PWD}/artifacts"
+          dockerRunArgs: |
+            --volume "${PWD}/artifacts:/artifacts"
+          env: |
+            artifact_name: devilutionx.tar.xz
+          install: |
+            apt-get update -q -y
+            apt-get install cmake g++ libsdl2-dev libsodium-dev libpng-dev libbz2-dev libgtest-dev libgmock-dev libsdl2-image-dev libfmt-dev -q -y
+          run:
+            cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release
+            cmake --build build -j $(getconf _NPROCESSORS_ONLN)
+            Packaging/nix/LinuxReleasePackaging.sh
+            cp devilutionx.tar.xz "${PWD}/artifacts:/artifacts"
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: devilutionx_linux_aaarch64.tar.xz
+          path: devilutionx.tar.xz
+      

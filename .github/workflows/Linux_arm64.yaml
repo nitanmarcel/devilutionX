@@ -18,7 +18,7 @@ jobs:
         fetch-depth: 0
     - name: Create Build Environment
       run: |
-        grep -rl "azure" /etc/apt/
+        cat /etc/apt/sources.list
         exit 0
         sudo dpkg --add-architecture arm64
         sudo apt-get update -y
